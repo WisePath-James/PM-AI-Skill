@@ -26,9 +26,13 @@ Cursor 加载 Skill 的能力取决于当前版本和配置。**不声称所有�
 
 Cline 支持自定义规则和 Skill 加载。将 `pm-ai-delivery-control/SKILL.md` 内容配置为 Cline 的系统提示词或规则集。
 
-### Claude Code (Codex)
+### Claude Code / similar coding agents
 
-Codex 支持 agent skills。将 Skill 文件放入 Codex 的 skill 目录，或在对话开始时引用 Skill 内容。
+Claude Code 的 Skill 加载能力取决于当前版本和配置。如果支持 Skill 或自定义规则加载，则将 `pm-ai-delivery-control/SKILL.md` 放入对应目录或引用为规则。如果不支持原生 Skill，则在对话开始时显式引用或粘贴 SKILL.md 内容，并按需读取 `references/`。
+
+### Codex / other agent environments
+
+Codex 的 Skill 加载能力取决于当前版本和配置。如果支持 Skill 或自定义规则加载，则将 `pm-ai-delivery-control/SKILL.md` 放入对应目录或引用为规则。如果不支持原生 Skill，则在对话开始时显式引用或粘贴 SKILL.md 内容，并按需读取 `references/`。
 
 ### Claude Desktop / 其他 MCP 支持工具
 

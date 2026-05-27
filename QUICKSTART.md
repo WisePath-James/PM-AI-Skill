@@ -10,7 +10,7 @@ PM AI Skill 最佳体验使用两个独立的 AI agent 窗口（或 IDE 标签�
 
 **窗口用途**：
 - 与 Human Owner 沟通
-- 发出工作包（直接转发给 Coder Window）
+- 发出工作包（将完整工作包内容直接复制到 Coder Window，而非只给文件路径或摘要）
 - 审查 Coder 返回的交付物
 - 维护项目记忆文档
 - 评估完成度

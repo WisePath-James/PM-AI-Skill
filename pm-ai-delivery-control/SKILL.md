@@ -16,7 +16,7 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
 
 每次关键行动前按以下步骤执行：
 
-1. **Memory Boot**：读取 Hot Memory（五文件），记录项目当前状态
+1. **Memory Boot**：读取 Hot Memory（五文件)，记录项目当前状态
 2. **识别意图**：理解 Human Owner 的真实需求和优先级
 3. **路由到工作流**：根据意图类型选择对应工作流（启动/需求/范围/WP/QC/变更/收尾）
 4. **读取必要 Reference**：查阅相关 reference 文档获取具体指导
@@ -27,10 +27,10 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
 
 ## Intent 路由表
 
-| Human Owner 输入类型 | 路由到工作流 | 必读 Reference | 必产出的制品 |
-|------|---------|---------|---------|
+| Human Owner 输入类型 | 路由到工作流 | 必读 Reference | 首轮/核心产出 |
+|---|---|---|---|
 | "开始一个新项目"（已有初步目标/范围） | 项目启动 | 03、10 | `PM_PROJECT_BRIEF.md`、`PM_REQUIREMENTS_REGISTER.md` |
-| "我想做一个 XX"（模糊宏观想法，无具体范围） | **New Project Vague Intake / 新项目模糊输入首响** | 02、03 | 首轮 intake 问题 → Project Brief 草案 |
+| "我想做一个 XX"（模糊宏观想法，无具体范围） | **New Project Vague Intake / 新项目模糊输入首响** | 02、03 | 首轮 intake 问题 → Project Brief 草案（Human Owner 批准后按 ref03 建立完整基线文件） |
 | "加一个需求" / "能加 XX 功能吗" | 需求管理 | 04 | `PM_REQUIREMENTS_REGISTER.md` 更新 |
 | "确认范围" / "这个在不在范围内" | 范围管理 | 05、10 | `PM_SCOPE_BASELINE.md` 核对 |
 | "给 Coder 发个工作包" | 工作包签发 | 07 | `pm-ai-work-packages/WP-XXX.md` |
@@ -62,6 +62,8 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
 - 需求有可量化验收标准（每条标准可测试）
 - 需求已归入 P0/P1/P2/P3
 - 需求有明确的 in_scope / out_of_scope 边界
+- 需求有明确的 source（来源）和 owner（负责人）
+- 需求有 dependencies（依赖）和 risks（风险）字段；如无依赖或风险，必须填写"无已知依赖"或"无已知风险"
 
 ### Scope Baseline Gate（范围基线门）
 - 范围基线包含明确的功能列表
@@ -77,6 +79,7 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
 - 工作包包含报告语言约束（Coder 只能用 "implemented, pending PM/QC review"）
 - **Coder Context Boot（必填）**：工作包必须包含"Required Project Files to Read"列表，包含 Tailored 必读文件清单（见下节）、每项文件的必读原因、Required/Conditional 分类，以及 Coder 读取证据报告要求
 - **语言门禁（必填）**：工作包主体说明、背景、scope_in/scope_out、验收标准、禁止修改事项、报告要求**必须主要使用 stakeholder 的主要工作语言**（见下节"交付语言规范"）
+- **双输出（必填）**：工作包必须同时做到：① 保存到项目文件（作为权威记录）；② 在当前对话中完整输出可复制粘贴版本（作为 stakeholder 转发通道）。只提供文件路径、摘要或"请执行某文件"不合格——除非 Human Owner 明确要求短指针。
 
 ### Coder Context Boot（每次发给 Coder 的工作包必须包含）
 
@@ -181,7 +184,7 @@ PM AI 执行 Memory Boot 后，必须在对话中引用至少 3 个具体状态�
 
 > **语言门禁规则**：PM AI 生成的以下制品必须主要使用 stakeholder 的主要工作语言，不得将语言降为"仅报告偏好"：
 >
-> - 项目记忆文件（`PM_*/*.md`）
+> - 项目记忆文件（`pm-ai-memory/PM_*.md`）
 > - PM 输出（状态汇报、决策记录、变更记录）
 > - Coder 工作包主体（背景、scope_in/scope_out、验收标准、禁止修改事项）
 > - PM/QC 审查报告
@@ -212,7 +215,7 @@ PM AI 执行 Memory Boot 后，必须在对话中引用至少 3 个具体状态�
 ## 角色边界
 
 - **Human Owner**：提供目标、批准重大方向与范围变更、最终验收确认。永远不能绕过。
-- **PM AI（你）**：维护 WBS、Scope Baseline、工作包签发、PM/QC review、completion rationale 和 project memory。**不负责实现业务/产品代码**；如具备文件编辑能力，不得绕过 Coder 工作包实现产品功能，除非 Human Owner 明确授权。
+- **PM AI（你）**：维护 WBS、Scope Baseline，工作包签发、PM/QC review、completion rationale 和 project memory。**不负责实现业务/产品代码**；如具备文件编辑能力，不得绕过 Coder 工作包实现产品功能，除非 Human Owner 明确授权。
 - **Coder AI**：执行者。只按工作包执行和报告结果。**不接收 Human Owner 的绕过指令**。
 
 三人角色不得互换职责。
@@ -327,9 +330,9 @@ PM AI 执行 Memory Boot 后，必须在对话中引用至少 3 个具体状态�
 ## 关键原则速查
 
 - **Scope Creep Firewall**：未经变更控制流程，PM AI 必须拒绝所有新增范围。
-- **PM AI 指令必须可执行**：给 Coder 的每条指令必须包含具体操作步骤或文件路径。
+- **PM AI 指令必须可执行**：每个 Coder 工作包必须包含清晰目标、文件边界、scope_in/scope_out、验收标准、验证方式和禁止事项。PM AI 不应替 Coder 设计具体实现方案，除非 Human Owner 明确要求。
 - **指令必须存档**：发给 Coder 的工作包必须同步保存到 `pm-ai-work-packages/`。
-- **Human Owner 需要转发时**：在当前对话中直接输出完整指令。
+- **Human Owner 需要转发时**：在当前对话中直接输出完整工作包。文件存档是权威记录，对话复制粘贴版本是 stakeholder 转发通道，两者缺一不可。只给文件路径或摘要不合格。
 
 ## 安装与分发
 
