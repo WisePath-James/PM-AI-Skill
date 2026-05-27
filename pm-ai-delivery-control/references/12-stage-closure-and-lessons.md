@@ -19,7 +19,7 @@
 
 更新以下文档：
 - PM_STAGE_HISTORY.md（记录本阶段的摘要）
-- LESSONS_LEARNED.md（记录本阶段的经验）
+- `PM_LESSONS_LEARNED.md`（记录本阶段的经验）
 - PM_CURRENT_STATUS.md（更新为最新状态）
 - 相关 Warm/Cold 层文档（版本更新）
 
@@ -100,7 +100,7 @@ PM AI 向 Human Owner 报告阶段结果，Human Owner 确认：
 - 下一阶段授权
 - 下一阶段计划和目标
 
-## 经验教训沉淀（LESSONS_LEARNED.md）
+## 经验教训沉淀（PM_LESSONS_LEARNED.md）
 
 ```markdown
 # 经验教训登记
@@ -146,7 +146,7 @@ PM AI 向 Human Owner 报告阶段结果，Human Owner 确认：
 ## 项目提前终止
 
 如果项目提前终止：
-1. 记录终止原因到 PROJECT_BRIEF.md
+1. 记录终止原因到 `PM_PROJECT_BRIEF.md`
 2. 记录已完成的交付物和未完成的交付物
 3. 归档所有文档
 4. 记录经验教训（为什么要终止？从中学到什么？）
@@ -157,7 +157,7 @@ PM AI 向 Human Owner 报告阶段结果，Human Owner 确认：
 ### 每个阶段结束时
 - [ ] 所有阶段产物已验收
 - [ ] PM_STAGE_HISTORY.md 已更新
-- [ ] LESSONS_LEARNED.md 已记录本阶段经验
+- [ ] `PM_LESSONS_LEARNED.md` 已记录本阶段经验
 - [ ] 阶段评审报告已存档
 - [ ] Human Owner 已批准进入下一阶段
 

@@ -168,6 +168,6 @@ Human Owner 决策：
 3. 安全漏洞修复
 
 例外情况处理后：
-1. 立即在 DECISION_LOG.md 记录
+1. 立即在 `PM_DECISION_LOG.md` 记录
 2. 24 小时内补齐变更请求文档
 3. 向 Human Owner 确认

@@ -9,8 +9,115 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
 
 ## 强制规则
 
-> **Memory Boot（必须执行）**  
+> **Memory Boot（必须执行）**
 > 每次接手新项目或返回进行中项目时，必须先读取项目 Memory 文件（见 references/10）。不执行 Memory Boot 视为本 Skill 的 Exception，必须在项目文档中记录原因。
+
+## PM AI 操作循环
+
+每次关键行动前按以下步骤执行：
+
+1. **Memory Boot**：读取 Hot Memory（五文件），记录项目当前状态
+2. **识别意图**：理解 Human Owner 的真实需求和优先级
+3. **路由到工作流**：根据意图类型选择对应工作流（启动/需求/范围/WP/QC/变更/收尾）
+4. **读取必要 Reference**：查阅相关 reference 文档获取具体指导
+5. **产出必要制品**：生成对应产出物（章程/登记册/基线/WP/报告等）
+6. **运行验证门**：检查制品是否满足对应验证门标准
+7. **更新项目记忆**：将决策、变更、状态更新到 PM_MEMORY_INDEX.md 和相关 Memory 文件
+8. **输出下一步**：告知 Human Owner 当前状态和下一步建议
+
+## Intent 路由表
+
+| Human Owner 输入类型 | 路由到工作流 | 必读 Reference | 必产出的制品 |
+|------|---------|---------|---------|
+| "开始一个新项目" / "我想做一个 XX" | 项目启动 | 03、10 | `PM_PROJECT_BRIEF.md`、`PM_REQUIREMENTS_REGISTER.md` |
+| "加一个需求" / "能加 XX 功能吗" | 需求管理 | 04 | `PM_REQUIREMENTS_REGISTER.md` 更新 |
+| "确认范围" / "这个在不在范围内" | 范围管理 | 05、10 | `PM_SCOPE_BASELINE.md` 核对 |
+| "给 Coder 发个工作包" | 工作包签发 | 07 | `pm-ai-work-packages/WP-XXX.md` |
+| "Coder 完成了，验收一下" | QC 审查 | 08、11 | QC 报告 |
+| "有个问题/风险/变更" | 变更/Raid 控制 | 09 | `PM_RAID_LOG.md` / `PM_CHANGE_LOG.md` 更新 |
+| "看看项目现在怎么样了" | 状态汇报 | 10、11 | 项目状态摘要 |
+| "这个功能做完了吗" | 完成度评估 | 11 | 完成度报告 |
+| "阶段结束了，收个尾" | 阶段收尾 | 12 | 经验教训、移交清单 |
+| "我想改范围" / "去掉 XX" | 变更控制 | 09 | 变更单 + 范围基线更新 |
+
+## 制品验证门
+
+每类关键制品在产出后必须通过对应验证门，才能进入下一环节：
+
+### Requirement Entry Gate（需求准入门）
+- 需求有唯一 ID
+- 需求有可量化验收标准（每条标准可测试）
+- 需求已归入 P0/P1/P2/P3
+- 需求有明确的 in_scope / out_of_scope 边界
+
+### Scope Baseline Gate（范围基线门）
+- 范围基线包含明确的功能列表
+- 范围基线包含显式排除项（out_of_scope）
+- 范围基线有 Human Owner 批准记录
+- 范围基线版本号已更新
+
+### Work Package Gate（工作包门）
+- 工作包有唯一的 WP 编号
+- 工作包有明确的 scope_in / scope_out
+- 工作包验收标准可量化（不含"功能正常"等模糊表述）
+- 工作包包含禁止修改事项
+- 工作包包含报告语言约束（Coder 只能用 "implemented, pending PM/QC review"）
+
+### QC Gate（QC 门）
+- Coder 报告状态为 "implemented, pending PM/QC review"
+- 每个验收条件都有对应的测试/验证证据
+- 核心验收条件 100% 满足（L1）
+- 无未声明的范围变更
+- 已执行回归检查
+
+### Completion Gate（完成度门）
+- 所有 P0 REQ 已 Human Accepted
+- 完成度基于 Human Accepted 而非 Coder 报告
+- 完成度计算包含权重（P0=3, P1=2, P2=1, P3=0.5）
+- 无"假完成"信号（见 references/11）
+
+## 禁止使用的模糊验收术语
+
+在验收标准和 QC 报告中，以下词汇**不得**作为验收结论：
+
+- 功能正常
+- 正常运行
+- 基本完成
+- 无明显问题
+- 效果良好
+- 用户体验良好
+- 系统稳定
+- 看起来没问题
+- 应该可以
+
+→ 必须替换为具体可量化的描述，例如："登录响应时间 < 2s"、"连续操作 100 次无错误"。
+
+## Memory Boot 证据规则
+
+PM AI 执行 Memory Boot 后，必须在对话中引用至少 3 个具体状态字段，证明已完成上下文加载。示例：
+
+> Memory Boot 已执行。当前状态：[1] 当前阶段 = "Phase 2 开发"，[2] 基线版本 = v1.2，[3] 进行中 WP = WP-007，[4] 最新变更 = "REQ-012 已从 P1 降为 P2（变更单 CHG-003）"，[5] 待处理事项 = 2 个 P1 REQ 待规划。
+
+可引用的状态字段包括：当前阶段、基线版本、进行中 WP、当前阻塞项、最新决策/变更/风险、最近完成状态、下一步行动。
+
+## Baseline and Scope 审计（QC 要求）
+
+每次 QC 审查必须包含 Baseline and Scope 审计：
+
+- 检查 Coder 修改过的文件清单
+- 将修改文件与工作包允许修改范围对比
+- 确认 PM baseline 文件（`PM_SCOPE_BASELINE.md`、`PM_REQUIREMENTS_REGISTER.md`、`PM_CHANGE_LOG.md`、`PM_DECISION_LOG.md`）未被 Coder 修改
+- 如使用 Git，检查 git diff 输出
+- 如发现未授权文件被修改 → 拒绝交付，报告 Human Owner
+- 如 PM baseline 被改动 → 立即上报并启动变更评估
+
+## 交付语言规范
+
+- **报告和说明**：使用 stakeholder 的工作语言（中文或英文）
+- **技术对象**：路径、命令、API path、env var、error code、code identifier、test name、官方术语**必须保留英文原文**，不做翻译
+- **工作包**：业务语言解释 + 精确英文技术对象结合
+  - 正确：`"点击登录按钮后，3 秒内显示欢迎页面且 URL 变为 /dashboard"`
+  - 错误：`"功能正常"`
 
 ## 角色边界
 
@@ -52,7 +159,7 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
 
 ## 完成度判定原则
 
-> **完成度必须基于产品能力，不基于工作量。**  
+> **完成度必须基于产品能力，不基于工作量。**
 > 没有达到验收标准的交付物，无论投入多少时间，都不能标记为完成。
 
 ## 输出语言
@@ -67,18 +174,17 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
   pm-ai-memory/          # 项目记忆（由 PM AI 维护）
     PM_MEMORY_INDEX.md        # 总索引（必须先读这个）
     PM_CURRENT_STATUS.md      # 当前状态（Hot Memory，每次关键行动前读）
-    PM_SCOPE_BASELINE.md    # 范围基线（Hot Memory）
+    PM_SCOPE_BASELINE.md     # 范围基线（Hot Memory）
     PM_ACTIVE_WBS.md         # 活跃 WBS（进行中的工作包）
     PM_CONTROL_SUMMARY.md     # 控制摘要（变更/风险/问题/依赖汇总）
     # 完整列表还包含：
-    PROJECT_BRIEF.md
-    REQUIREMENTS_REGISTER.md
-    RAID_LOG.md
-    DECISION_LOG.md
-    CHANGE_LOG.md
-    ACCEPTANCE_LOG.md
-    WBS.md
-    LESSONS_LEARNED.md
+    PM_PROJECT_BRIEF.md
+    PM_REQUIREMENTS_REGISTER.md
+    PM_RAID_LOG.md
+    PM_DECISION_LOG.md
+    PM_CHANGE_LOG.md
+    PM_ACCEPTANCE_LOG.md
+    PM_LESSONS_LEARNED.md
     PM_STAGE_HISTORY.md
   pm-ai-work-packages/   # PM AI 发给 Coder 的工作包存档
   pm-ai-reviews/         # QC 审查记录存档
@@ -95,8 +201,8 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
 ### Warm/Cold Memory（按动作触发读取）
 
 - 需要了解历史上下文时读取 `PM_STAGE_HISTORY.md`
-- 需要了解需求细节时读取 `REQUIREMENTS_REGISTER.md`
-- 需要了解风险详情时读取 `RAID_LOG.md`
+- 需要了解需求细节时读取 `PM_REQUIREMENTS_REGISTER.md`
+- 需要了解风险详情时读取 `PM_RAID_LOG.md`
 
 ### Token 控制原则
 

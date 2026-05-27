@@ -15,6 +15,9 @@
 - 签发日期：[YYYY-MM-DD]
 - 对应需求：REQ-[XXX]
 - 对应 WBS 项：WBS-[X.X.X]
+- 复杂度：Low / Medium / High
+- 预计 PM-Coder 迭代次数：1 / 2-3 / 4+
+- 不确定性：Low / Medium / High
 
 ## 背景
 [描述这个工作包要解决什么问题，为什么要做这件事。帮助 Coder 理解上下文。]
@@ -72,7 +75,7 @@
 - Coder 最终状态只能使用：**implemented, pending PM/QC review**
 - Coder **不得宣布** accepted / complete / MVP done / finished / ready
 - Coder **不得提升**完成度
-- Coder **不得修改** PM baseline（DECISION_LOG.md、CHANGE_LOG.md 等）
+- Coder **不得修改** PM baseline（`PM_DECISION_LOG.md`、`PM_CHANGE_LOG.md` 等）
 
 ## 完成后操作
 1. 在当前对话中报告完成结果
@@ -121,7 +124,7 @@ Coder 报告工作包"部分完成"时：
 1. 评估已完成的交付物是否满足验收条件
 2. 满足 → 正常验收流程
 3. 不满足 → 发回重做，说明不满足的具体项
-4. 记录差异到 ACCEPTANCE_LOG.md
+4. 记录差异到 `PM_ACCEPTANCE_LOG.md`
 
 ### Coder 报告超出范围
 Coder 报告发现"额外工作"时：

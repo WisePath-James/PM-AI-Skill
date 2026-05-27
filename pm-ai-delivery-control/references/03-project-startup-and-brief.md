@@ -32,10 +32,10 @@
 ### Step 5：建立基线
 
 确认后，创建：
-- REQUIREMENTS_REGISTER.md（需求基线）
-- SCOPE_BASELINE.md（范围基线）
-- WBS.md（WBS 基线）
-- RAID_LOG.md（初始化）
+- `PM_REQUIREMENTS_REGISTER.md`（需求登记册）
+- `PM_SCOPE_BASELINE.md`（范围基线）
+- `PM_ACTIVE_WBS.md`（活跃 WBS）
+- `PM_RAID_LOG.md`（初始化）
 
 ## 项目章程模板
 

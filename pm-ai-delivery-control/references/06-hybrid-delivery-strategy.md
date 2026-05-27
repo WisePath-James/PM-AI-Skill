@@ -26,16 +26,18 @@
 
 ### 敏捷（Agile）
 - 迭代节奏：1-4 周固定长度 Sprint
-- 角色：Product Owner（Human Owner）/Scrum Master（PM AI）/Team（Coder）
+- 角色：Human Owner（Product Owner 授权保留）/ Scrum Master（PM AI）/ Team（Coder）
 - 仪式：Sprint Planning → Daily Standup → Review → Retrospective
 - 适合：需求不确定、需快速验证、技术创新
 - 典型场景：MVP 开发、产品迭代、功能实验
 
 **敏捷中的 PM AI 职责**：
-- 作为事实上的 Product Owner，维护 Product Backlog
-- Sprint Planning 时将 Backlog Item 转化为 Sprint Goal
+- 作为 Backlog Manager / Delivery Coordinator / Scrum-aware PM
+- Sprint Planning 时将已批准的 Backlog Item 转化为 Sprint Goal
 - 每个 Sprint 结束时进行 Review + Retrospective
 - 保护 Coder 不受频繁需求变更冲击
+- **不**作为 Product Owner：最终业务优先级决策由 Human Owner 保留
+- 可**推荐**优先级，但**不**能做最终的业务优先级决策
 
 ### 混合（Hybrid）
 - 外层：瀑布阶段框架（如：Phase 1 基础架构 → Phase 2 功能开发 → Phase 3 集成测试）

@@ -44,28 +44,27 @@
 | PM_MEMORY_INDEX.md | 每次文档更新 | 总索引，所有文档入口 |
 | PM_CURRENT_STATUS.md | 每周或每次重大事件 | 当前状态摘要 |
 | PM_SCOPE_BASELINE.md | 每次范围变更 | 范围基线 |
-| PM_ACTIVE_WBS.md | 每次工作包状态变化 | 活跃工作包精简列表 |
+| PM_ACTIVE_WBS.md | 每次工作包状态变化 | 活跃工作包精简列表（进行中项） |
 | PM_CONTROL_SUMMARY.md | 每次相关更新 | 变更/风险/问题/依赖汇总 |
-| REQUIREMENTS_REGISTER.md | 每次需求变化 | 需求清单和状态 |
-| CHANGE_LOG.md | 每次变更 | 变更记录 |
-| DECISION_LOG.md | 每次决策 | 决策记录 |
+| PM_REQUIREMENTS_REGISTER.md | 每次需求变化 | 需求清单和状态 |
+| PM_CHANGE_LOG.md | 每次变更 | 变更记录 |
+| PM_DECISION_LOG.md | 每次决策 | 决策记录 |
 
 ### Warm 层（按动作触发读取）
 
 | 文件 | 更新频率 | 内容 |
 |------|---------|------|
-| PROJECT_BRIEF.md | 每次重大变化 | 项目章程和背景 |
-| ACCEPTANCE_LOG.md | 每次验收 | 验收记录 |
-| RAID_LOG.md | 每次更新 | 风险/问题/假设/依赖详情 |
-| WBS.md | 每次工作包变化 | 完整工作分解结构 |
+| PM_PROJECT_BRIEF.md | 每次重大变化 | 项目章程和背景 |
+| PM_ACCEPTANCE_LOG.md | 每次验收 | 验收记录 |
+| PM_RAID_LOG.md | 每次更新 | 风险/问题/假设/依赖详情 |
+| PM_WBS_PLAN.md | 每次工作包变化 | 完整 WBS（包含所有阶段和子项） |
 
 ### Cold 层（阶段性读取）
 
 | 文件 | 更新频率 | 内容 |
 |------|---------|------|
 | PM_STAGE_HISTORY.md | 每阶段结束 | 阶段历史 |
-| LESSONS_LEARNED.md | 每阶段结束 | 经验教训 |
-| PM_PROJECT_BRIEF.md | 每次重大变化 | 项目章程 |
+| PM_LESSONS_LEARNED.md | 每阶段结束 | 经验教训 |
 
 ## 项目文档结构约定
 
@@ -75,17 +74,17 @@
     PM_MEMORY_INDEX.md        # 总索引（必须先读这个）
     PM_CURRENT_STATUS.md      # 当前状态摘要（Hot Memory）
     PM_SCOPE_BASELINE.md     # 范围基线（Hot Memory）
-    PM_ACTIVE_WBS.md         # 活跃工作包列表（Hot Memory）
+    PM_ACTIVE_WBS.md         # 活跃工作包列表（Hot Memory，进行中项）
     PM_CONTROL_SUMMARY.md     # 控制汇总（Hot Memory）
     PM_PROJECT_BRIEF.md      # 项目章程
-    REQUIREMENTS_REGISTER.md
-    RAID_LOG.md
-    DECISION_LOG.md
-    CHANGE_LOG.md
-    ACCEPTANCE_LOG.md
-    WBS.md
+    PM_REQUIREMENTS_REGISTER.md
+    PM_RAID_LOG.md
+    PM_DECISION_LOG.md
+    PM_CHANGE_LOG.md
+    PM_ACCEPTANCE_LOG.md
+    PM_WBS_PLAN.md          # 完整 WBS（Warm Memory）
+    PM_LESSONS_LEARNED.md
     PM_STAGE_HISTORY.md
-    LESSONS_LEARNED.md
   pm-ai-work-packages/     # 工作包存档
     WP-001.md
     WP-001-RESULT.md
@@ -115,7 +114,8 @@
 | PM_ACTIVE_WBS.md | pm-ai-memory/ | [日期] | vX.X |
 | PM_CONTROL_SUMMARY.md | pm-ai-memory/ | [日期] | vX.X |
 | PM_SCOPE_BASELINE.md | pm-ai-memory/ | [日期] | vX.X |
-| REQUIREMENTS_REGISTER.md | pm-ai-memory/ | [日期] | vX.X |
+| PM_REQUIREMENTS_REGISTER.md | pm-ai-memory/ | [日期] | vX.X |
+| PM_WBS_PLAN.md | pm-ai-memory/ | [日期] | vX.X |
 | ... | ... | ... | ... |
 
 ## 当前状态摘要
@@ -161,7 +161,7 @@
 | `PM_MEMORY_INDEX.md` | 总索引，所有文档的入口和更新时间 | 每次文档更新 |
 | `PM_CURRENT_STATUS.md` | 当前状态摘要（3-5 句话） | 每周或每次重大事件 |
 | `PM_SCOPE_BASELINE.md` | 范围基线 | 每次范围变更 |
-| `PM_ACTIVE_WBS.md` | 活跃 WBS（进行中的工作包精简列表） | 每次工作包状态变化 |
+| `PM_ACTIVE_WBS.md` | 活跃工作包精简列表（进行中的工作包） | 每次工作包状态变化 |
 | `PM_CONTROL_SUMMARY.md` | 变更/风险/问题/依赖汇总 | 每次相关更新 |
 
 ### Token 控制原则
@@ -170,9 +170,9 @@
 
 1. **总入口**：`PM_MEMORY_INDEX.md` 索引所有文档的最后更新时间，先判断需要读哪些
 2. **状态快照**：`PM_CURRENT_STATUS.md` 提供当前项目状态的 3-5 句话摘要
-3. **活跃工作**：`PM_ACTIVE_WBS.md` 只列出进行中的工作包，避免读完整 WBS
+3. **活跃工作**：`PM_ACTIVE_WBS.md` 只列出进行中的工作包，避免读完整 WBS（`PM_WBS_PLAN.md`）
 4. **控制汇总**：`PM_CONTROL_SUMMARY.md` 汇总变更/风险/问题的最新状态，不展开历史详情
 
-如需历史详情，再按需读取 Warm/Cold 层文档（PM_STAGE_HISTORY.md、LESSONS_LEARNED.md 等）。
+如需历史详情，再按需读取 Warm/Cold 层文档（`PM_STAGE_HISTORY.md`、`PM_LESSONS_LEARNED.md`、`PM_WBS_PLAN.md` 等）。
 
-下游项目可使用等价命名，但必须包含以上 5 个信息角色。
+下游项目可使用等价命名，但必须包含以上 5 个 Hot Memory 信息角色。`PM_ACTIVE_WBS.md`（精简列表）和 `PM_WBS_PLAN.md`（完整结构）是不同文件，不得合并或混淆。

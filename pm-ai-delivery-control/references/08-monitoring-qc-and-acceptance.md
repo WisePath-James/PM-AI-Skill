@@ -8,11 +8,28 @@ PM AI 必须严格区分以下五层，不得混用：
 |------|------|--------|---------|
 | Coder Implemented | Coder 报告代码已写完，所有验收条件有对应测试结果 | Coder | 代码完成，不等于验收通过 |
 | PM Reviewed | PM AI 已检查代码和测试结果，给出质量评级 | PM AI | 已审阅，不等于 PM QC 通过 |
-| PM/QC Accepted | PM AI 基于验收标准做出客观 QC 判定，符合 L1 或 L2 条件 | PM AI | PM 层 QC 通过 |
+| PM/QC Accepted | PM AI 基于验收标准做出客观 QC 判定，**仅限 L1** | PM AI | PM 层 QC 通过（仅 L1） |
 | Human Accepted | Human Owner 确认功能满足业务需求，做出最终接受决定 | Human Owner | 业务层接受 |
 | Product Done | 所有层级通过，且系统整体满足 Product criteria（集成、回归、安全等） | PM AI + Human Owner | 产品真正完成 |
 
-**关键约束**：Coder 的报告状态永远不等于 accepted。Coder 只能说 "implemented, pending PM/QC review"。PM/QC Accepted 也不等于 Human Accepted。
+**关键约束**：
+- Coder 的报告状态永远不等于 accepted。Coder 只能说 "implemented, pending PM/QC review"。
+- **PM/QC Accepted 仅限 L1**。L2 不算 PM/QC Accepted，必须进入 `needs human decision`。
+- PM/QC Accepted 也不等于 Human Accepted。
+
+## 分级验收标准（L1 / L2 / L3）
+
+| 等级 | 定义 | PM AI 审查结论 |
+|------|------|---------------|
+| **L1 — 完全通过** | 所有核心和次要验收标准 100% 满足，无已知缺陷 | `accepted` — 可进入 Human Owner 最终验收 |
+| **L2 — 条件通过** | 核心验收标准全部满足，次要标准有不超过 3 个轻微缺陷 | `needs human decision` — 需 Human Owner 决策后才可临时接受；除非 Human Owner 已明确批准条件接受，否则不能成为 PM/QC Accepted |
+| **L3 — 不通过** | 核心验收标准未满足，或正常使用时受到影响 | `rework required` — 必须修复后重新验收 |
+
+**规则**：
+- L1 → `accepted` → PM/QC Accepted → 可进入 Human Owner 最终验收
+- L2 → `needs human decision` → Human Owner 决策后，若批准则可临时接受，但仍是 Human Accepted 前置状态
+- L3 → `rework required` → 发回 Coder 修复
+- Human Accepted 是最终完成度的唯一计分基础
 
 ## 监控节奏
 
@@ -54,17 +71,19 @@ PM AI 必须严格区分以下五层，不得混用：
 
 ### Step 4：质量评级
 
+根据 L1/L2/L3 标准给出评级（见上表）。
+
 ### Step 5：审查结论
 
-基于 Step 4 的质量评级，PM AI 给出以下审查结论之一：
+基于质量评级，PM AI 给出以下审查结论之一：
 
-| 审查结论 | 条件 |
-|---------|------|
-| **accepted** | L1（全部通过），所有验收条件满足，可以进入 Human Owner 验收 |
-| **rework required** | L2 或 L3，需要 Coder 修复后重新提交 |
-| **parked due to blocker** | 存在 PM AI 无法控制的外部阻塞，Coder 暂停该工作包 |
-| **rejected due to scope violation** | Coder 交付物超出 scope_in 或违反了禁止修改事项 |
-| **needs human decision** | 超出 PM AI 决策权限，需要 Human Owner 判断 |
+| 审查结论 | 对应条件 |
+|---------|---------|
+| **accepted** | L1 — 所有验收条件满足，PM/QC Accepted |
+| **needs human decision** | L2 — 核心标准满足但有轻微缺陷，需 Human Owner 决策 |
+| **rework required** | L3 — 核心标准未满足，必须修复 |
+| **parked due to blocker** | 存在 PM AI 无法控制的外部阻塞 |
+| **rejected due to scope violation** | 交付物超出 scope_in 或违反禁止修改事项 |
 
 ## QC 报告模板
 
@@ -79,7 +98,7 @@ PM QC 时间：[时间]
 ### 五层验收状态
 - Coder Implemented：[是/否]
 - PM Reviewed：[是/否]
-- PM/QC Accepted：[是/否，等待 Human Owner 验收]
+- PM/QC Accepted：[仅 L1 时填"是"，否则"否"]
 - Human Accepted：[待 Human Owner 确认]
 - Product Done：[待所有层完成]
 
@@ -96,17 +115,17 @@ PM QC 时间：[时间]
 - [ ] 符合技术约束
 - [ ] 未超出 scope_in / scope_out
 
-### 质量评级
-- [ ] L1 — 全部通过
-- [ ] L2 — 小问题，需要修改后复检
-- [ ] L3 — 重大问题，拒绝
+### 质量评级（L1 / L2 / L3）
+- [ ] **L1** — 全部验收标准满足，无已知缺陷 → 审查结论：`accepted`
+- [ ] **L2** — 核心标准满足，有轻微缺陷（≤3 个） → 审查结论：`needs human decision`
+- [ ] **L3** — 核心标准未满足 → 审查结论：`rework required`
 
 ### PM AI 审查结论
-- [ ] **accepted** — 通知 Human Owner 进行最终验收
-- [ ] **rework required** — [附具体修改清单]
+- [ ] **accepted** — 通知 Human Owner 进行最终验收（仅 L1）
+- [ ] **needs human decision** — [附决策问题]（L2）
+- [ ] **rework required** — [附具体修改清单]（L3）
 - [ ] **parked due to blocker** — [附阻塞原因]
 - [ ] **rejected due to scope violation** — [附违规描述]
-- [ ] **needs human decision** — [附决策问题]
 
 ### 备注
 [补充说明]
@@ -150,7 +169,7 @@ PM AI 向 Human Owner 汇报时，使用以下格式：
 ### 整体进度
 - 已完成：[X] 个工作包
 - 进行中：[X] 个工作包
-- 整体完成度：[X]%（基于验收通过的功能）
+- 整体完成度：[X]%（基于 Human Accepted）
 
 ### 关键事项
 - [事项 1]
@@ -176,7 +195,7 @@ PM AI 向 Human Owner 汇报时，使用以下格式：
 
 **Q：Coder 的交付物在主要功能上满足，但有几个小问题**
 
-L2 评级。记录小问题，给出修改清单。设定截止时间。如果 Human Owner 要求接受有缺陷的交付物，记录为 exception 并说明影响。
+L2 评级。记录小问题，给出修改清单。审查结论为 `needs human decision`，由 Human Owner 决定是否接受有缺陷的交付物。
 
 **Q：QC 发现回归问题（破坏了已有功能）**
 
@@ -184,4 +203,4 @@ L2 评级。记录小问题，给出修改清单。设定截止时间。如果 H
 
 **Q：Coder 报告"无法在截止时间前完成"**
 
-评估原因。是否在 PM AI 控制范围内？是否需要上报 Human Owner？记录到 DECISION_LOG.md。
+评估原因。是否在 PM AI 控制范围内？是否需要上报 Human Owner？记录到 `PM_DECISION_LOG.md`。
