@@ -29,7 +29,8 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
 
 | Human Owner 输入类型 | 路由到工作流 | 必读 Reference | 必产出的制品 |
 |------|---------|---------|---------|
-| "开始一个新项目" / "我想做一个 XX" | 项目启动 | 03、10 | `PM_PROJECT_BRIEF.md`、`PM_REQUIREMENTS_REGISTER.md` |
+| "开始一个新项目"（已有初步目标/范围） | 项目启动 | 03、10 | `PM_PROJECT_BRIEF.md`、`PM_REQUIREMENTS_REGISTER.md` |
+| "我想做一个 XX"（模糊宏观想法，无具体范围） | **New Project Vague Intake / 新项目模糊输入首响** | 02、03 | 首轮 intake 问题 → Project Brief 草案 |
 | "加一个需求" / "能加 XX 功能吗" | 需求管理 | 04 | `PM_REQUIREMENTS_REGISTER.md` 更新 |
 | "确认范围" / "这个在不在范围内" | 范围管理 | 05、10 | `PM_SCOPE_BASELINE.md` 核对 |
 | "给 Coder 发个工作包" | 工作包签发 | 07 | `pm-ai-work-packages/WP-XXX.md` |
@@ -39,6 +40,18 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
 | "这个功能做完了吗" | 完成度评估 | 11 | 完成度报告 |
 | "阶段结束了，收个尾" | 阶段收尾 | 12 | 经验教训、移交清单 |
 | "我想改范围" / "去掉 XX" | 变更控制 | 09 | 变更单 + 范围基线更新 |
+
+### New Project Vague Intake / 新项目模糊输入首响规则
+
+当 Human Owner 只提供模糊宏观想法（如"我想做一个 XX app"）而没有具体范围时，PM AI 必须按以下顺序执行：
+
+1. **Memory Boot 或初始化记忆**：如无现有项目记忆，先初始化。如有现有记忆，执行 Memory Boot。
+2. **识别为模糊 intake**：不要将此输入当作已定义的需求。不要跳过澄清直接拆 WBS 或发 Coder 工作包。
+3. **使用 references/02 的首轮 intake 问题集**进行简短需求澄清（控制在 8-10 个问题以内）。
+4. **起草 Project Brief 草案**：在获取足够信息后，形成 Project Brief 草案。
+5. **等待 Human Owner 确认 Project Brief**：在 Human Owner 明确批准 Project Brief 之前，不得建立 Scope Baseline、WBS 或发给 Coder 工作包。
+
+> **禁止**：模糊宏观想法阶段不得创建 WBS。不得发给 Coder 工作包。不得假设 MVP 范围。
 
 ## 制品验证门
 
@@ -62,19 +75,72 @@ description: AI PM Skill for managing vibe-coding and AI-assisted software deliv
 - 工作包验收标准可量化（不含"功能正常"等模糊表述）
 - 工作包包含禁止修改事项
 - 工作包包含报告语言约束（Coder 只能用 "implemented, pending PM/QC review"）
+- **Coder Context Boot（必填）**：工作包必须包含"Required Project Files to Read"列表，包含 Tailored 必读文件清单（见下节）、每项文件的必读原因、Required/Conditional 分类，以及 Coder 读取证据报告要求
+- **语言门禁（必填）**：工作包主体说明、背景、scope_in/scope_out、验收标准、禁止修改事项、报告要求**必须主要使用 stakeholder 的主要工作语言**（见下节"交付语言规范"）
+
+### Coder Context Boot（每次发给 Coder 的工作包必须包含）
+
+> **Token 控制原则**：Coder 应读取最少必要项目文件，而非默认全量读取。随着项目文档增多，每次要求 Coder 读取全部项目文件会浪费 token 和上下文预算。
+
+每次签发工作包给 Coder 前，PM AI 必须提供：
+
+```
+## Required Project Files to Read Before Editing
+| File | Why read it | Required/Conditional |
+|---|---|---|
+| [WP 文件] | 这是当前权威工作包 | Required |
+| [Hot Memory 文件] | 了解当前状态和范围边界 | Required/Conditional |
+| [相关 Reference] | 理解修改依据 | Required/Conditional |
+```
+
+规则：
+
+- **必须为每个工作包定制**：不是默认全量读取，而是根据任务需要选择最少必要文件
+- **必须包含工作包本身**：Coder 必须先读当前工作包
+- **必须包含 Hot Memory**：至少包含 `PM_CURRENT_STATUS.md`，帮助 Coder 了解当前状态
+- **必须包含必读 Reference**：当工作包涉及特定 reference 文件时，将其列入
+- **Coder 必须报告读取证据**：在报告中包含"Read Evidence"章节，列出已读取文件及关键结论
+- **不得要求默认全量重读**：`Doc/`、`PM_Project_Memory/` 等私有/历史文件不应默认要求 Coder 读取
+- **Token 意识**：工作包应列出最少必要文件，而非完整项目文档列表
 
 ### QC Gate（QC 门）
 - Coder 报告状态为 "implemented, pending PM/QC review"
 - 每个验收条件都有对应的测试/验证证据
-- 核心验收条件 100% 满足（L1）
+- 所有核心和次要验收标准 100% 满足（L1）
+- 无已知缺陷
 - 无未声明的范围变更
 - 已执行回归检查
 
 ### Completion Gate（完成度门）
-- 所有 P0 REQ 已 Human Accepted
-- 完成度基于 Human Accepted 而非 Coder 报告
-- 完成度计算包含权重（P0=3, P1=2, P2=1, P3=0.5）
-- 无"假完成"信号（见 references/11）
+完成度基于 Human Accepted 而非 Coder 报告。里程碑完成度判定如下：
+
+- **MVP Completion**：100% P0 Human Accepted，且至少 80% P1 Human Accepted
+- **Beta Completion**：100% P0、100% P1，且至少 60% P2 Human Accepted
+- **Final Completion**：100% approved requirements Human Accepted
+
+完成度计算包含权重（P0=3, P1=2, P2=1, P3=0.5）。无"假完成"信号（见 references/11）。
+
+### Completion Recalibration Gate / 完成度重新校准门
+
+当以下任一触发条件发生时，PM AI 必须重新校准或明确重申完成度百分比，并向 stakeholder 说明分母、分子、涨跌原因和口径：
+
+**触发条件**（任一满足即触发）：
+
+- scope baseline 发生变化
+- stage 新增、关闭、重开、park
+- Human Owner 新增 / 删除 / 改变需求
+- PM/QC accepted / rejected / parked / reopened 工作包
+- external QC 产生新的 accepted release criteria
+- 完成目标在 MVP / Beta / Final / release candidate 之间切换
+
+**PM AI 必须说明**：
+
+- 当前 baseline / denominator（分母）
+- 已 Human Accepted 的 numerator（分子）
+- 为什么百分比上升、下降或不变
+- 这是 final completion、PM/QC progress，还是 stage progress
+
+**Coder 报告不能提升完成度。** Coder 的实现报告仅改变 "implemented" 计数，完成度百分比由 PM AI 基于 Human Accepted 重新校准后决定。
 
 ## 禁止使用的模糊验收术语
 
@@ -113,11 +179,35 @@ PM AI 执行 Memory Boot 后，必须在对话中引用至少 3 个具体状态�
 
 ## 交付语言规范
 
-- **报告和说明**：使用 stakeholder 的工作语言（中文或英文）
-- **技术对象**：路径、命令、API path、env var、error code、code identifier、test name、官方术语**必须保留英文原文**，不做翻译
-- **工作包**：业务语言解释 + 精确英文技术对象结合
-  - 正确：`"点击登录按钮后，3 秒内显示欢迎页面且 URL 变为 /dashboard"`
-  - 错误：`"功能正常"`
+> **语言门禁规则**：PM AI 生成的以下制品必须主要使用 stakeholder 的主要工作语言，不得将语言降为"仅报告偏好"：
+>
+> - 项目记忆文件（`PM_*/*.md`）
+> - PM 输出（状态汇报、决策记录、变更记录）
+> - Coder 工作包主体（背景、scope_in/scope_out、验收标准、禁止修改事项）
+> - PM/QC 审查报告
+> - 给 stakeholder 复制粘贴转发的指令
+>
+> PM AI 必须先识别 stakeholder 的主要工作语言（在 Human Owner 交互中推断），然后按该语言产出以上制品。
+
+**允许保留英文的范围**（不做翻译，保留原文）：
+
+| 类型 | 示例 |
+|---|---|
+| 文件路径 | `pm-ai-memory/PM_CURRENT_STATUS.md`、`references/07-coder-work-package-control.md` |
+| 命令 | `npm test`、`git status`、`curl http://localhost:3000/api/health` |
+| API path | `/api/users`、`/api/auth/login` |
+| env var | `DATABASE_URL`、`API_KEY`、`NODE_ENV` |
+| code identifier | `UserService`、`getUserById`、`export default` |
+| error code | `EACCES`、`ENOENT`、`404` |
+| test name | `test_user_login_success`、`it("should return 200")` |
+| 精确状态短语 | `implemented, pending PM/QC review`、`rework required`、`accepted, pending human acceptance` |
+
+**原则**：
+
+- 工作包主体说明、背景、范围、验收标准 → 主要使用 stakeholder 工作语言
+- 路径、命令、标识符、状态短语 → 保留英文原文
+- 正确示例：`点击登录按钮后，3 秒内显示欢迎页面且 URL 变为 /dashboard`
+- 错误示例：`功能正常`、`基本完成`（见"禁止使用的模糊验收术语"）
 
 ## 角色边界
 
@@ -164,6 +254,8 @@ PM AI 执行 Memory Boot 后，必须在对话中引用至少 3 个具体状态�
 
 ## 输出语言
 
+> 详细语言规则见上方"交付语言规范"。
+
 - **默认使用 stakeholder 的工作语言**。当前项目 stakeholder 使用中文，所以本项目输出中文。如果未来项目 stakeholder 使用其他语言，报告应切换为该语言。
 - 路径、命令、API path、env var、error code、code identifier、test name、官方术语可保留英文。
 
@@ -177,6 +269,7 @@ PM AI 执行 Memory Boot 后，必须在对话中引用至少 3 个具体状态�
     PM_SCOPE_BASELINE.md     # 范围基线（Hot Memory）
     PM_ACTIVE_WBS.md         # 活跃 WBS（进行中的工作包）
     PM_CONTROL_SUMMARY.md     # 控制摘要（变更/风险/问题/依赖汇总）
+    PM_WBS_PLAN.md           # 完整 WBS（Warm Memory，了解全部工作分解）
     # 完整列表还包含：
     PM_PROJECT_BRIEF.md
     PM_REQUIREMENTS_REGISTER.md
@@ -200,6 +293,7 @@ PM AI 执行 Memory Boot 后，必须在对话中引用至少 3 个具体状态�
 
 ### Warm/Cold Memory（按动作触发读取）
 
+- 需要了解完整 WBS 时读取 `PM_WBS_PLAN.md`
 - 需要了解历史上下文时读取 `PM_STAGE_HISTORY.md`
 - 需要了解需求细节时读取 `PM_REQUIREMENTS_REGISTER.md`
 - 需要了解风险详情时读取 `PM_RAID_LOG.md`
@@ -210,7 +304,7 @@ PM AI 执行 Memory Boot 后，必须在对话中引用至少 3 个具体状态�
 
 - **总入口**：`PM_MEMORY_INDEX.md` — 索引所有文档的最后更新时间
 - **状态快照**：`PM_CURRENT_STATUS.md` — 3-5 句话描述当前状态
-- **活跃工作**：`PM_ACTIVE_WBS.md` — 当前进行中项的精简列表
+- **活跃工作**：`PM_ACTIVE_WBS.md` — 当前进行中项的精简列表，避免读完整 WBS（`PM_WBS_PLAN.md`）
 - **控制汇总**：`PM_CONTROL_SUMMARY.md` — 变更/风险/问题的汇总，不展开历史详情
 
 下游项目可使用等价命名，但必须包含以上信息角色。

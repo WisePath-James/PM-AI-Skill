@@ -27,15 +27,18 @@
 
 ### Step 4：Human Owner 确认
 
-将章程发给 Human Owner 确认。只有 Human Owner 明确批准后，才能进入规划阶段。
+将 Project Brief 草案发给 Human Owner 确认。**只有 Human Owner 明确批准后，才能进入规划阶段（建立基线、创建 WBS、发给 Coder 工作包）。**
 
 ### Step 5：建立基线
 
-确认后，创建：
-- `PM_REQUIREMENTS_REGISTER.md`（需求登记册）
-- `PM_SCOPE_BASELINE.md`（范围基线）
-- `PM_ACTIVE_WBS.md`（活跃 WBS）
-- `PM_RAID_LOG.md`（初始化）
+确认后，创建以下 Memory 文件：
+
+- `PM_PROJECT_BRIEF.md` — 项目章程
+- `PM_REQUIREMENTS_REGISTER.md` — 需求登记册
+- `PM_SCOPE_BASELINE.md` — 范围基线
+- `PM_ACTIVE_WBS.md` — 活跃 WBS（进行中的工作包）
+- `PM_CONTROL_SUMMARY.md` — 控制摘要（变更/风险/问题/依赖汇总）
+- `PM_RAID_LOG.md` — RAID 日志（初始化）
 
 ## 项目章程模板
 
@@ -112,7 +115,7 @@
 
 **Q：Human Owner 给了一个非常模糊的想法怎么办？**
 
-使用 references/02 的澄清清单进行追问。记录所有待澄清项，标注优先级。在澄清完成前，不开始正式规划。
+使用 references/02 的"New Project Vague Intake / 新项目模糊输入首轮问题"小节进行追问。**在 Human Owner 确认 Project Brief 草案之前，不得创建 WBS，不得发给 Coder 工作包，不得假设 MVP 范围。**记录所有待澄清项，标注优先级。
 
 **Q：Human Owner 要求立刻开始写代码怎么办？**
 

@@ -117,6 +117,37 @@ PM AI 必须警惕以下"假完成"信号：
 6. **完成了但没集成**：独立模块完成了但没有集成到系统，不算整体完成
 7. **完成了但 Human Owner 不知道**：没有向 Human Owner 演示确认，不算验收
 
+## 完成度重新校准
+
+当发生以下任一情况时，PM AI 必须重新校准或明确重申完成度百分比：
+
+**触发条件**：
+
+| 触发事件 | 说明 |
+|---------|------|
+| Scope baseline 变化 | 范围基线修改后必须重新校准分母 |
+| Stage 新增 / 关闭 / 重开 / park | 新增阶段改变总工作量，关闭阶段改变当前里程碑分母 |
+| Human Owner 新增 / 删除 / 改变需求 | 需求变动直接影响 numerator 和 denominator |
+| PM/QC accepted / rejected / parked / reopened 工作包 | 验收状态变化改变 Human Accepted 计数 |
+| External QC 产生新的 accepted release criteria | 外部 QC 新增标准改变分母 |
+| 完成目标在 MVP / Beta / Final / release candidate 之间切换 | 里程碑切换重新定义"完成"的标准 |
+
+**重新校准时必须说明**：
+
+1. **Baseline / scope version（基线版本）**：当前分母所依据的基线版本或日期
+2. **Numerator（分子）**：已 Human Accepted 的交付物计数（含权重）
+3. **变化原因**：为什么百分比上升、下降或不变
+4. **Completion type（完成度类型）**：
+   - **Final completion** — 基于 Human Accepted 的最终完成度
+   - **PM-QC progress** — 基于 PM/QC Accepted（L1）的中间进度
+   - **Stage progress** — 当前 stage 内的局部进度
+
+**规则**：
+
+- **Human Accepted 是最终完成度的唯一计分基础**。PM/QC Accepted（L1）是必要条件而非充分条件。
+- **Coder 报告不能提升完成度**。Coder 的实现报告只能改变 "implemented" 计数，完成度百分比由 PM AI 在重新校准后决定。
+- 重新校准后必须向 stakeholder 说明变化原因，不得在无解释的情况下直接修改完成度数值。
+
 ## 完成度报告模板
 
 ```markdown
@@ -124,6 +155,12 @@ PM AI 必须警惕以下"假完成"信号：
 
 报告日期：[日期]
 报告人：PM AI
+
+### 重新校准信息（必填）
+- **Last recalibrated / 上次重新校准日期**：[日期]
+- **Baseline / scope version / 基线版本**：[版本号或日期]
+- **Reason for change / no change / 变化原因**：[发生了什么变化，或明确说明无变化]
+- **Completion type / 完成度类型**：[Final completion / PM-QC progress / Stage progress]
 
 ### 整体完成度
 - 当前完成度：[X]%（基于 Human Accepted）

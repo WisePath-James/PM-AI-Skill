@@ -14,7 +14,11 @@
 
 ### Cursor（推荐）
 
-Cursor 支持 Skill 文件加载。在 Cursor 设置中添加 Skill 路径，或将 Skill 内容复制到 Cursor 的 Skill 目录。
+Cursor 加载 Skill 的能力取决于当前版本和配置。**不声称所有版本都支持直接 Skill 路径加载。**
+
+**推荐方式**：将 `pm-ai-delivery-control/SKILL.md` 作为 PM Window 的项目规则、自定义指令或 Skill 内容加载。按需读取 `references/` 下的文档。
+
+**如果没有原生 Skill 加载能力**：在 PM Window 对话开始时显式引用或粘贴 SKILL.md 内容，并按需读取 references/ 下的文件。
 
 **推荐用法**：PM Window 专用 Cursor 窗口加载本 Skill，Coder Window 使用另一个独立的 Cursor 窗口。
 
